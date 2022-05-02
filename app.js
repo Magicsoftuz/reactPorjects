@@ -6,7 +6,7 @@ const userRouter = require('./router/userRouter');
 const app = express();
 const morgan = require('morgan');
 
-app.use(express.json()); // Middleware qorovulcha
+app.use(express.json());
 
 app.use(morgan('common'));
 
@@ -15,18 +15,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Static file middleware
-
 app.use(express.static(`${__dirname}/public`));
-
-// Params middleware
 
 tourRouter.param('', (req, res, next, val) => {
   console.log(val);
   next();
 });
-
-// App Users routing
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);

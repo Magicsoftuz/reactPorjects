@@ -70,7 +70,7 @@ const getToursAll = async (req, res) => {
     //   }
     // }
 
-    const queryData = await data;
+    const queryData = await data.surov;
 
     if (queryData.length) {
       res.status(200).json({

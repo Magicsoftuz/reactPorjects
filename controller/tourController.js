@@ -2,17 +2,47 @@ const Tour = require('./../model/tourModel');
 
 const getToursAll = async (req, res) => {
   try {
-    const data = await Tour.find();
+    // magic.uz/api?name=umid&price=100
+    // req.query = {name: "umid", price:100}
 
-    res.status(200).json({
-      status: 'Success',
-      results: data.length,
-      body: data,
-    });
+    // 1) Filter (Advanced and Basic)
+    const querySalom = { ...req.query };
+    console.log(querySalom);
+    const removeQuery = ['sort', 'page', 'limit', 'field'];
+    removeQuery.forEach((val) => delete querySalom[val]);
+    console.log(querySalom);
+
+    const queryStr = JSON.stringify(querySalom)
+      .replace(/\gte\b/g, '$gte')
+      .replace(/\blte\b/g, '$lte')
+      .replace(/\blt\b/g, '$lt')
+      .replace(/\bgt\b/g, '$gt');
+
+    let data = Tour.find(JSON.parse(queryStr));
+
+    //2) Sorting
+
+    if (req.query.sort) {
+      const querySort = req.query.sort.split(',').join(' ');
+      console.log(querySort);
+      data = data.sort(querySort);
+    }
+
+    const queryData = await data;
+
+    if (queryData.length) {
+      res.status(200).json({
+        status: 'Success',
+        results: queryData.length,
+        body: queryData,
+      });
+    } else {
+      throw new Error('Error');
+    }
   } catch (err) {
     res.status(404).json({
       status: 'Fail',
-      message: 'Invalid data',
+      message: err,
     });
   }
 };
